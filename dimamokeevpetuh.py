@@ -5,6 +5,12 @@ SX=1200
 SY=700
 VMAX=10
 
+def create_ball():
+    b=ball(rx(),ry(),rv(),rv(),rr())
+    balls.append(b)
+    b.draw_ball(b.color)
+    b.move_ball()
+
 def click(event):
     x, y = event.x, event.y
     for ball_name in balls:
@@ -16,7 +22,7 @@ def rx():
 def ry():
     return(randint(SY//3,(2*SY)//3))
 def rv():
-    return(randint(-1*VMAX,VMAX))
+    return(randint(-1 * VMAX, VMAX))
 def rr():
     rr=600//(20+pasha.score)
     return(rr)
@@ -25,6 +31,7 @@ class player:
         self.score=0
         self.name=name
         self.maxscore=0
+        self.number_balls=1
     
 class ball:
     def __init__(self, x, y, vx, vy, r):
@@ -41,6 +48,10 @@ class ball:
         canv.create_oval(self.x - self.r, self.y - self.r, self.x + self.r, self.y + self.r, fill = col, width=0)
         
     def move_ball(self):
+        if pasha.score <=-20:
+            fi=open('record.txt','r+')
+            fi.write(' '+ str(pasha.maxscore))
+            root.after(1000,exit())
         if self.died_time == 0:
             self.draw_ball('white')
             self.x+=self.vx
@@ -59,6 +70,7 @@ class ball:
         root.after(30,self.move_ball)
         
     def kill_ball(self):
+        global s
         self.draw_ball('white')
         self.vx=rv()
         self.vy=rv()
@@ -70,9 +82,13 @@ class ball:
         if pasha.score > pasha.maxscore :
             pasha.maxscore = pasha.score
             l['text'] = 'Счёт игрока ' + pasha.name + ' = ' +  str(pasha.score) + ' Ваш максимум = ' + str(pasha.maxscore)
+        if pasha.score >= pasha.number_balls*10:
+            create_ball()
+            pasha.number_balls+=1
 
-        
 
+
+            
 root=Tk()
 root.geometry(str(SX)+'x'+str(SY))
 canv = Canvas(root,bg='white')
@@ -81,16 +97,7 @@ balls= []
 
 pasha=player('Pasha')
 
-b1=ball(rx(),ry(),rv(),rv(),30)
-balls.append(b1)
-b1.draw_ball(b1.color)
-b1.move_ball()
-
-b2=ball(rx(),ry(),rv(),rv(),30)
-balls.append(b2)
-b2.draw_ball(b1.color)
-b2.move_ball()
-
+create_ball()
 l = Label(bg='black', fg='white', width=100)
 l['text'] = 'Счёт игрока ' + pasha.name + ' = ' +  str(pasha.score) + ' Ваш максимум = ' + str(pasha.maxscore)
 l.pack()
