@@ -152,7 +152,6 @@ class target():
         canv.coords(self.id, -10, -10, -10, -10)
         self.points += points
         canv.itemconfig(self.id_points, text=self.points)
-        self.new_target()
 
 
 t1 = target()
@@ -193,4 +192,4 @@ def new_game(event=''):
 
 new_game()
 
-mainloop()
+root.mainloop()
