@@ -51,21 +51,21 @@ class ball():
         self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
         и стен по краям окна (размер окна 800х600).
         """
-        self.vy-= 1
+        self.vy -= 1
         if self.x > 800 or self.x <0 :
             self.vx = - self.vx
         if self.y > 600 or self.y <0 :
             self.vy = - self.vy
         self.x += self.vx
         self.y -= self.vy
-        self.id = canv.create_oval(
-                self.x - self.r,
-                self.y - self.r,
-                self.x + self.r,
-                self.y + self.r,
-                fill=self.color
-        )
+        self.set_coords()
+        canv.itemconfig(self.id, fill=self.color)
+        self.live -= 1
         
+        if self.live <= 0:
+            canv.delete(self.id)
+            balls.remove(self)
+
 
     def hittest(self, obj):
         """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
@@ -134,7 +134,6 @@ class target():
     def __init__(self):
         self.points = 0
         self.live = 1
-        #FIXME: don't work!!! How to call this functions when object is created?
         self.id = canv.create_oval(0,0,0,0)
         self.id_points = canv.create_text(30,30,text = self.points,font = '28')
         self.new_target()
@@ -153,6 +152,7 @@ class target():
         canv.coords(self.id, -10, -10, -10, -10)
         self.points += points
         canv.itemconfig(self.id_points, text=self.points)
+        self.new_target()
 
 
 t1 = target()
