@@ -143,16 +143,32 @@ class target():
         x = self.x = rnd(600, 780)
         y = self.y = rnd(300, 550)
         r = self.r = rnd(2, 50)
+        self.vx = rnd(-3,3)
+        self.vy = rnd(-3,3)
         color = self.color = 'red'
         canv.coords(self.id, x-r, y-r, x+r, y+r)
         canv.itemconfig(self.id, fill=color)
-
+        self.move()
+        
     def hit(self, points=1):
         """Попадание шарика в цель."""
         canv.coords(self.id, -10, -10, -10, -10)
         self.points += points
         canv.itemconfig(self.id_points, text=self.points)
+        self.new_target()
 
+    def move(self):
+        if self.x < 0 or self.x > 800:
+            self.vx = - self.vx
+        if self.y < 0 or self.y > 600:
+            self.vy = - self.vy
+        self.x += self.vx
+        self.y += self.vy
+        canv.coords(self.id, self.x-self.r, self.y-self.r, self.x+self.r, self.y+self.r)
+        canv.itemconfig(self.id, fill=self.color)
+        root.after(50, self.move)
+
+        
 
 t1 = target()
 screen1 = canv.create_text(400, 300, text='', font='28')
