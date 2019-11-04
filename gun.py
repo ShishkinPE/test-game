@@ -33,8 +33,8 @@ class ball():
                 self.y + self.r,
                 fill=self.color
         )
-        self.live = 30
-
+        self.live = 90
+        
     def set_coords(self):
         canv.coords(
                 self.id,
@@ -43,7 +43,7 @@ class ball():
                 self.x + self.r,
                 self.y + self.r
         )
-
+        
     def move(self):
         """Переместить мяч по прошествии единицы времени.
 
@@ -65,7 +65,7 @@ class ball():
         if self.live <= 0:
             canv.delete(self.id)
             balls.remove(self)
-
+        root.after(20, self.move)
 
     def hittest(self, obj):
         """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
@@ -104,9 +104,11 @@ class gun():
         self.an = math.atan((event.y-new_ball.y) / (event.x-new_ball.x))
         new_ball.vx = self.f2_power * math.cos(self.an)
         new_ball.vy = - self.f2_power * math.sin(self.an)
+        new_ball.move()
         balls += [new_ball]
         self.f2_on = 0
         self.f2_power = 10
+        
 
     def targetting(self, event=0):
         """Прицеливание. Зависит от положения мыши."""
@@ -158,6 +160,7 @@ class target():
         self.new_target()
 
     def move(self):
+        global balls
         if self.x < 0 or self.x > 800:
             self.vx = - self.vx
         if self.y < 0 or self.y > 600:
@@ -166,39 +169,48 @@ class target():
         self.y += self.vy
         canv.coords(self.id, self.x-self.r, self.y-self.r, self.x+self.r, self.y+self.r)
         canv.itemconfig(self.id, fill=self.color)
+        for b in balls:
+            if b.hittest(self) and self.live:
+                self.live = 0
+                self.hit()
+                canv.bind('<Button-1>', '')
+                canv.bind('<ButtonRelease-1>', '')
+                canv.itemconfig(screen1, text='Вы уничтожили цель за ' + str(bullet) + ' выстрелов')
         root.after(50, self.move)
 
-        
 
-t1 = target()
 screen1 = canv.create_text(400, 300, text='', font='28')
+targets = []
 g1 = gun()
 bullet = 0
 balls = []
+for i in range(3):
+    targ = target()
+    targets.append(targ)
+    
 
+
+def check_live(targets):
+    res = 1
+    for t in targets:
+       if t.live == 0:
+           res = 0
+    return res
 
 def new_game(event=''):
-    global gun, t1, screen1, balls, bullet
-    t1.new_target()
+    global gun, screen1, balls, bullet, targets
+
     bullet = 0
     balls = []
     canv.bind('<Button-1>', g1.fire2_start)
     canv.bind('<ButtonRelease-1>', g1.fire2_end)
     canv.bind('<Motion>', g1.targetting)
-
-    z = 0.03
-    t1.live = 1
-    while t1.live or balls:
-        for b in balls:
-            b.move()
-            if b.hittest(t1) and t1.live:
-                t1.live = 0
-                t1.hit()
-                canv.bind('<Button-1>', '')
-                canv.bind('<ButtonRelease-1>', '')
-                canv.itemconfig(screen1, text='Вы уничтожили цель за ' + str(bullet) + ' выстрелов')
+    z = 0.01
+    for t in targets:
+        t.live=1
+    while check_live(targets) or balls:
         canv.update()
-        time.sleep(0.03)
+        time.sleep(0.01)
         g1.targetting()
         g1.power_up()
     canv.itemconfig(screen1, text='')
