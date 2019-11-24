@@ -31,7 +31,7 @@ class ball():
                 self.y - self.r,
                 self.x + self.r,
                 self.y + self.r,
-                fill=self.color
+                fill = self.color
         )
         self.live = 90
         
@@ -51,6 +51,8 @@ class ball():
         self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
         и стен по краям окна (размер окна 800х600).
         """
+        global balls
+
         self.vy -= 1
         if self.x > 800 or self.x <0 :
             self.vx = - self.vx
@@ -59,12 +61,14 @@ class ball():
         self.x += self.vx
         self.y -= self.vy
         self.set_coords()
-        canv.itemconfig(self.id, fill=self.color)
+        canv.itemconfig(self.id, fill = self.color)
         self.live -= 1
         
         if self.live <= 0:
             canv.delete(self.id)
-            balls.remove(self)
+            for b in balls:
+                if b == self:
+                    balls.remove(b)
         root.after(20, self.move)
 
     def hittest(self, obj):
@@ -80,7 +84,9 @@ class ball():
         else:
             return False
 
-
+    def __eq__(self, other):
+        return self is other
+    
 class gun():
     def __init__ (self):
         self.f2_power = 10
@@ -105,13 +111,14 @@ class gun():
         new_ball.vx = self.f2_power * math.cos(self.an)
         new_ball.vy = - self.f2_power * math.sin(self.an)
         new_ball.move()
-        balls += [new_ball]
+        balls.append(new_ball)
         self.f2_on = 0
         self.f2_power = 10
         
 
     def targetting(self, event=0):
         """Прицеливание. Зависит от положения мыши."""
+        global canv
         if event:
             self.an = math.atan((event.y-450) / (event.x-20))
         if self.f2_on:
