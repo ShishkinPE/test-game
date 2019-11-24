@@ -49,9 +49,10 @@ class ball:
         
     def move_ball(self):
         if pasha.score <=-20:
-            fi=open('record.txt','r+')
+            fi = open('record.txt','a+')
             fi.write(' '+ str(pasha.maxscore))
             root.after(1000,exit())
+            
         if self.died_time == 0:
             self.draw_ball('white')
             self.x+=self.vx
